@@ -1,920 +1,376 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>ValidateIQ — D2C Product Validation</title>
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
-  :root {
-    --ink:       #0e1117;
-    --ink2:      #2a2f3a;
-    --muted:     #6b7280;
-    --faint:     #e5e7eb;
-    --faint2:    #f3f4f6;
-    --white:     #ffffff;
-    --accent:    #2563eb;
-    --accent-lt: #eff6ff;
-    --green:     #166534;
-    --green-lt:  #f0fdf4;
-    --amber:     #92400e;
-    --amber-lt:  #fffbeb;
-    --red:       #991b1b;
-    --red-lt:    #fef2f2;
-    --radius:    10px;
-    --radius-lg: 16px;
-  }
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-  html { font-size: 16px; }
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: #f8f9fb;
-    color: var(--ink);
-    min-height: 100vh;
-    line-height: 1.6;
-  }
-
-  /* ── TOP BAR ── */
-  .topbar {
-    background: var(--white);
-    border-bottom: 1px solid var(--faint);
-    padding: 0 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    height: 56px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .logo {
-    display: flex; align-items: center; gap: 10px;
-    font-family: 'Instrument Serif', serif;
-    font-size: 1.25rem; color: var(--ink);
-    text-decoration: none;
-  }
-  .logo-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); }
-  .topbar-right { display: flex; align-items: center; gap: 12px; }
-  .tag { font-size: 11px; padding: 3px 10px; border-radius: 20px; font-weight: 500; }
-  .tag-blue { background: var(--accent-lt); color: var(--accent); }
-  .tag-green { background: var(--green-lt); color: var(--green); }
-  .tag-amber { background: var(--amber-lt); color: var(--amber); }
-
-  /* ── LAYOUT ── */
-  .page { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 4rem; }
-
-  /* ── HERO ── */
-  .hero { margin-bottom: 2.5rem; }
-  .hero h1 {
-    font-family: 'Instrument Serif', serif;
-    font-size: clamp(1.8rem, 4vw, 2.6rem);
-    color: var(--ink);
-    line-height: 1.2;
-    margin-bottom: .5rem;
-  }
-  .hero h1 em { font-style: italic; color: var(--accent); }
-  .hero p { color: var(--muted); font-size: .95rem; max-width: 520px; }
-
-  /* ── FORM CARD ── */
-  .form-card {
-    background: var(--white);
-    border: 1px solid var(--faint);
-    border-radius: var(--radius-lg);
-    padding: 1.75rem;
-    margin-bottom: 1.25rem;
-  }
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
-  .form-full { grid-column: 1 / -1; }
-  .field { display: flex; flex-direction: column; gap: 5px; }
-  .field label { font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
-  .field input, .field select, .field textarea {
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    background: var(--faint2);
-    border: 1px solid var(--faint);
-    border-radius: var(--radius);
-    padding: 9px 12px;
-    color: var(--ink);
-    transition: border-color .15s, box-shadow .15s;
-    width: 100%;
-  }
-  .field input:focus, .field select:focus, .field textarea:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 0 3px rgba(37,99,235,.1);
-    background: var(--white);
-  }
-  .field textarea { resize: vertical; min-height: 90px; }
-  .field input:disabled { opacity: .5; cursor: not-allowed; }
-  .field-note { font-size: 11px; color: var(--muted); margin-top: 2px; }
-
-  .api-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem; }
-  .api-field { display: flex; flex-direction: column; gap: 5px; }
-  .api-label { display: flex; align-items: center; justify-content: space-between; }
-  .api-label span { font-size: 12px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; }
-
-  /* ── RUN BUTTON ── */
-  .run-btn {
-    width: 100%;
-    padding: 13px;
-    background: var(--ink);
-    color: var(--white);
-    border: none;
-    border-radius: var(--radius);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 500;
-    cursor: pointer;
-    margin-bottom: 1.75rem;
-    transition: background .15s, transform .1s;
-    letter-spacing: .01em;
-  }
-  .run-btn:hover { background: var(--ink2); }
-  .run-btn:active { transform: scale(.99); }
-  .run-btn:disabled { opacity: .4; cursor: not-allowed; transform: none; }
-
-  /* ── PIPELINE ── */
-  .pipeline {
-    display: flex;
-    background: var(--white);
-    border: 1px solid var(--faint);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    margin-bottom: 1.25rem;
-  }
-  .step { flex: 1; padding: 12px 6px; text-align: center; border-right: 1px solid var(--faint); transition: background .2s; }
-  .step:last-child { border-right: none; }
-  .step-ic { font-size: 15px; margin-bottom: 3px; color: var(--muted); }
-  .step-lb { font-size: 10px; color: var(--muted); line-height: 1.3; font-weight: 500; text-transform: uppercase; letter-spacing: .04em; }
-  .step.active { background: #eff6ff; }
-  .step.active .step-ic, .step.active .step-lb { color: var(--accent); }
-  .step.done { background: var(--green-lt); }
-  .step.done .step-ic, .step.done .step-lb { color: var(--green); }
-  .step.warn { background: var(--amber-lt); }
-  .step.warn .step-lb { color: var(--amber); }
-
-  /* ── LOG ── */
-  .logbox {
-    background: var(--ink);
-    color: #a3e635;
-    border-radius: var(--radius);
-    padding: 1rem 1.25rem;
-    font-family: 'DM Mono', monospace;
-    font-size: 12px;
-    line-height: 1.6;
-    max-height: 200px;
-    overflow-y: auto;
-    margin-bottom: 1.5rem;
-    display: none;
-  }
-  .ll { margin-bottom: 2px; }
-  .ll.info { color: #60a5fa; }
-  .ll.ok { color: #a3e635; }
-  .ll.warn { color: #fbbf24; }
-  .ll.err { color: #f87171; }
-
-  /* ── REPORT ── */
-  .rpt { display: none; }
-
-  .src-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; align-items: center; }
-  .src-row-label { font-size: 12px; color: var(--muted); font-weight: 500; margin-right: 4px; }
-  .src-pill {
-    display: flex; align-items: center; gap: 5px;
-    font-size: 11px; font-weight: 500;
-    padding: 4px 11px; border-radius: 20px; border: 1px solid;
-  }
-  .sp-live { background: var(--green-lt); color: var(--green); border-color: #86efac; }
-  .sp-est { background: var(--amber-lt); color: var(--amber); border-color: #fcd34d; }
-  .sp-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-  .sp-live .sp-dot { background: var(--green); }
-  .sp-est .sp-dot { background: var(--amber); }
-
-  /* ── VERDICT ── */
-  .verdict {
-    border-radius: var(--radius-lg);
-    padding: 1.5rem 1.75rem;
-    margin-bottom: 1.5rem;
-    border: 1.5px solid;
-  }
-  .v-go { background: var(--green-lt); border-color: #86efac; }
-  .v-iterate { background: var(--amber-lt); border-color: #fcd34d; }
-  .v-kill { background: var(--red-lt); border-color: #fca5a5; }
-  .v-eyebrow { font-size: 11px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 5px; }
-  .v-go .v-eyebrow { color: var(--green); }
-  .v-iterate .v-eyebrow { color: var(--amber); }
-  .v-kill .v-eyebrow { color: var(--red); }
-  .v-score { font-family: 'Instrument Serif', serif; font-size: 3rem; color: var(--ink); margin-bottom: 4px; line-height: 1; }
-  .v-text { font-size: 14px; color: var(--ink2); line-height: 1.7; }
-
-  /* ── SCORE GRID ── */
-  .score-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-bottom: 1.5rem; }
-  .sc-card { background: var(--white); border: 1px solid var(--faint); border-radius: var(--radius); padding: 12px 10px; text-align: center; }
-  .sc-label { font-size: 10px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 6px; line-height: 1.3; }
-  .sc-val { font-family: 'Instrument Serif', serif; font-size: 1.8rem; color: var(--ink); }
-  .sc-bar { height: 3px; border-radius: 2px; background: var(--faint); margin-top: 6px; }
-  .sc-fill { height: 3px; border-radius: 2px; }
-  .f-g { background: #16a34a; } .f-a { background: #d97706; } .f-r { background: #dc2626; }
-
-  /* ── RAW DATA ── */
-  .raw-section { margin-bottom: 1.5rem; }
-  .section-title { font-size: 13px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 10px; }
-  .raw-card { background: var(--white); border: 1px solid var(--faint); border-radius: var(--radius-lg); margin-bottom: 6px; overflow: hidden; }
-  .raw-head { display: flex; align-items: center; gap: 10px; padding: 11px 1rem; cursor: pointer; user-select: none; }
-  .raw-head:hover { background: var(--faint2); }
-  .raw-source-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-  .dot-reddit { background: #ff4500; }
-  .dot-amazon { background: #ff9900; }
-  .dot-google { background: #4285f4; }
-  .raw-head-title { font-size: 13px; font-weight: 500; color: var(--ink); flex: 1; }
-  .raw-head-count { font-size: 11px; color: var(--muted); }
-  .raw-chev { font-size: 12px; color: var(--muted); transition: transform .2s; }
-  .raw-chev.open { transform: rotate(90deg); }
-  .raw-body { display: none; padding: .75rem 1rem; border-top: 1px solid var(--faint); }
-  .raw-body.open { display: block; }
-  .raw-item { padding: 8px 10px; background: var(--faint2); border-radius: 8px; margin-bottom: 5px; font-size: 12px; line-height: 1.5; }
-  .raw-item a { color: var(--accent); text-decoration: none; }
-  .raw-item a:hover { text-decoration: underline; }
-  .raw-item-sub { font-size: 10px; color: var(--muted); margin-top: 2px; }
-
-  /* ── LAYERS ── */
-  .layers { display: flex; flex-direction: column; gap: 8px; margin-bottom: 1.5rem; }
-  .layer { background: var(--white); border: 1px solid var(--faint); border-radius: var(--radius-lg); overflow: hidden; }
-  .layer-head { display: flex; align-items: center; gap: 10px; padding: 13px 1.25rem; cursor: pointer; user-select: none; }
-  .layer-head:hover { background: var(--faint2); }
-  .l-num { width: 26px; height: 26px; border-radius: 50%; background: var(--faint2); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: var(--muted); flex-shrink: 0; }
-  .l-name { font-size: 14px; font-weight: 500; color: var(--ink); flex: 1; }
-  .l-src { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
-  .src-live { background: var(--green-lt); color: var(--green); }
-  .src-est { background: var(--amber-lt); color: var(--amber); }
-  .l-pill { font-size: 12px; font-weight: 600; padding: 3px 11px; border-radius: 20px; }
-  .p-g { background: var(--green-lt); color: var(--green); }
-  .p-a { background: var(--amber-lt); color: var(--amber); }
-  .p-r { background: var(--red-lt); color: var(--red); }
-  .l-chev { font-size: 12px; color: var(--muted); transition: transform .2s; }
-  .l-chev.open { transform: rotate(90deg); }
-  .layer-body { display: none; padding: 1.25rem; border-top: 1px solid var(--faint); }
-  .layer-body.open { display: block; }
-  .l-finding { font-size: 13px; color: var(--ink2); line-height: 1.75; margin-bottom: 12px; }
-  .l-extra { margin-bottom: 12px; }
-  .kv2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .kv { padding: 10px 12px; background: var(--faint2); border-radius: 8px; }
-  .kv-k { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-bottom: 3px; }
-  .kv-v { font-size: 13px; font-weight: 500; color: var(--ink); }
-  .gap2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .gap-pos { padding: 10px 12px; background: var(--green-lt); border-radius: 8px; font-size: 12px; color: var(--green); }
-  .gap-neg { padding: 10px 12px; background: var(--red-lt); border-radius: 8px; font-size: 12px; color: var(--red); }
-  .gap-strong { display: block; font-weight: 600; margin-bottom: 3px; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
-  .sigs { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
-  .sig { display: flex; align-items: flex-start; gap: 8px; padding: 8px 10px; background: var(--faint2); border-radius: 8px; font-size: 12px; }
-  .sig-src { font-size: 10px; color: var(--muted); min-width: 70px; padding-top: 1px; font-weight: 500; }
-  .sig-txt { flex: 1; color: var(--ink); line-height: 1.5; }
-  .sig-sent { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
-  .ss-p { background: var(--green-lt); color: var(--green); }
-  .ss-n { background: var(--red-lt); color: var(--red); }
-  .ss-u { background: var(--amber-lt); color: var(--amber); }
-  .l-rec { font-size: 12px; padding: 10px 12px; background: var(--accent-lt); color: var(--accent); border-radius: 8px; font-weight: 500; }
-  .quotes { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
-  .q { font-size: 12px; font-style: italic; color: var(--ink2); padding: 9px 12px; background: var(--faint2); border-radius: 8px; border-left: 3px solid var(--faint); line-height: 1.6; }
-  .q-src { font-size: 10px; color: var(--muted); font-style: normal; margin-top: 3px; font-weight: 500; }
-  .pw-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
-  .pw { font-size: 12px; padding: 3px 10px; background: var(--faint2); border: 1px solid var(--faint); border-radius: 20px; color: var(--ink); font-weight: 500; }
-  .sublabel { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin: 10px 0 6px; }
-
-  /* ── BOTTOM GRID ── */
-  .divider { border: none; border-top: 1px solid var(--faint); margin: 1.75rem 0; }
-  .bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
-  .b-card { background: var(--white); border: 1px solid var(--faint); border-radius: var(--radius-lg); padding: 1.25rem; }
-  .b-card-title { font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 10px; }
-  .b-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 7px; }
-  .b-list li { font-size: 13px; color: var(--ink2); line-height: 1.55; padding-left: 16px; position: relative; }
-  .b-list li::before { content: '›'; position: absolute; left: 0; color: var(--accent); font-weight: 700; }
-
-  /* ── ACTION BUTTONS ── */
-  .actions { display: flex; gap: 8px; flex-wrap: wrap; }
-  .act {
-    flex: 1; min-width: 150px; padding: 11px 14px;
-    background: var(--white); border: 1px solid var(--faint);
-    border-radius: var(--radius); font-family: 'DM Sans', sans-serif;
-    font-size: 13px; cursor: pointer; color: var(--ink); font-weight: 500;
-    transition: background .15s, border-color .15s;
-  }
-  .act:hover { background: var(--faint2); border-color: var(--faint); }
-  .act.primary { background: var(--ink); color: var(--white); border-color: transparent; }
-  .act.primary:hover { background: var(--ink2); }
-
-  /* ── FOOTER ── */
-  .footer { text-align: center; padding: 2rem 0 0; font-size: 12px; color: var(--muted); }
-
-  /* ── RESPONSIVE ── */
-  @media (max-width: 640px) {
-    .form-grid { grid-template-columns: 1fr; }
-    .api-grid { grid-template-columns: 1fr; }
-    .score-grid { grid-template-columns: repeat(3, 1fr); }
-    .kv2, .gap2, .bottom-grid { grid-template-columns: 1fr; }
-    .actions { flex-direction: column; }
-  }
+:root{--ink:#0e1117;--ink2:#2a2f3a;--muted:#6b7280;--faint:#e5e7eb;--faint2:#f3f4f6;--white:#ffffff;--accent:#2563eb;--accent-lt:#eff6ff;--green:#166534;--green-lt:#f0fdf4;--amber:#92400e;--amber-lt:#fffbeb;--red:#991b1b;--red-lt:#fef2f2;--radius:10px;--radius-lg:16px;}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:#f8f9fb;color:var(--ink);min-height:100vh;line-height:1.6;}
+.topbar{background:var(--white);border-bottom:1px solid var(--faint);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:100;}
+.logo{display:flex;align-items:center;gap:10px;font-family:'Instrument Serif',serif;font-size:1.25rem;color:var(--ink);text-decoration:none;}
+.logo-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);}
+.tag{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;background:var(--accent-lt);color:var(--accent);}
+.page{max-width:860px;margin:0 auto;padding:2.5rem 1.5rem 4rem;}
+.hero{margin-bottom:2rem;}
+.hero h1{font-family:'Instrument Serif',serif;font-size:clamp(1.8rem,4vw,2.5rem);color:var(--ink);line-height:1.2;margin-bottom:.4rem;}
+.hero h1 em{font-style:italic;color:var(--accent);}
+.hero p{color:var(--muted);font-size:.9rem;max-width:540px;}
+.form-card{background:var(--white);border:1px solid var(--faint);border-radius:var(--radius-lg);padding:1.75rem;margin-bottom:1.25rem;}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1rem;}
+.grid2:last-child{margin-bottom:0;}
+.full{grid-column:1/-1;}
+.field{display:flex;flex-direction:column;gap:5px;}
+.flabel{font-size:11px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;display:flex;align-items:center;justify-content:space-between;}
+.flabel .ftag{font-size:10px;padding:1px 8px;border-radius:20px;font-weight:500;text-transform:none;letter-spacing:0;}
+.ftag-req{background:var(--accent-lt);color:var(--accent);}
+.ftag-opt{background:var(--green-lt);color:var(--green);}
+input,select,textarea{font-family:'DM Sans',sans-serif;font-size:14px;background:var(--faint2);border:1px solid var(--faint);border-radius:var(--radius);padding:9px 12px;color:var(--ink);width:100%;transition:border-color .15s,box-shadow .15s;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(37,99,235,.1);background:var(--white);}
+textarea{resize:vertical;min-height:90px;}
+.fn{font-size:11px;color:var(--muted);margin-top:2px;}
+.run-btn{width:100%;padding:13px;background:var(--ink);color:var(--white);border:none;border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:15px;font-weight:500;cursor:pointer;margin-bottom:1.75rem;transition:background .15s;}
+.run-btn:hover{background:var(--ink2);}
+.run-btn:disabled{opacity:.4;cursor:not-allowed;}
+.pipeline{display:flex;background:var(--white);border:1px solid var(--faint);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:1.25rem;}
+.step{flex:1;padding:12px 6px;text-align:center;border-right:1px solid var(--faint);}
+.step:last-child{border-right:none;}
+.sic{font-size:14px;margin-bottom:3px;color:var(--muted);}
+.slb{font-size:9px;color:var(--muted);font-weight:500;text-transform:uppercase;letter-spacing:.04em;line-height:1.3;}
+.step.active{background:var(--accent-lt);}
+.step.active .sic,.step.active .slb{color:var(--accent);}
+.step.done{background:var(--green-lt);}
+.step.done .sic,.step.done .slb{color:var(--green);}
+.step.skip{background:var(--amber-lt);}
+.step.skip .slb{color:var(--amber);}
+.logbox{background:var(--ink);color:#a3e635;border-radius:var(--radius);padding:1rem 1.25rem;font-family:'DM Mono',monospace;font-size:12px;line-height:1.6;max-height:200px;overflow-y:auto;margin-bottom:1.5rem;display:none;}
+.ll{margin-bottom:2px;}
+.ll.info{color:#60a5fa;}
+.ll.ok{color:#a3e635;}
+.ll.warn{color:#fbbf24;}
+.ll.err{color:#f87171;}
+.rpt{display:none;}
+.src-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:1.5rem;align-items:center;}
+.src-lbl{font-size:12px;color:var(--muted);font-weight:500;}
+.sp{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:4px 11px;border-radius:20px;border:1px solid;}
+.sp-live{background:var(--green-lt);color:var(--green);border-color:#86efac;}
+.sp-est{background:var(--amber-lt);color:var(--amber);border-color:#fcd34d;}
+.sp-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.sp-live .sp-dot{background:var(--green);}
+.sp-est .sp-dot{background:var(--amber);}
+.verdict{border-radius:var(--radius-lg);padding:1.5rem 1.75rem;margin-bottom:1.5rem;border:1.5px solid;}
+.v-go{background:var(--green-lt);border-color:#86efac;}
+.v-iterate{background:var(--amber-lt);border-color:#fcd34d;}
+.v-kill{background:var(--red-lt);border-color:#fca5a5;}
+.vey{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;margin-bottom:5px;}
+.v-go .vey{color:var(--green);}
+.v-iterate .vey{color:var(--amber);}
+.v-kill .vey{color:var(--red);}
+.vscore{font-family:'Instrument Serif',serif;font-size:3rem;color:var(--ink);margin-bottom:5px;line-height:1;}
+.vtext{font-size:14px;color:var(--ink2);line-height:1.7;}
+.sgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:1.5rem;}
+.sc{background:var(--white);border:1px solid var(--faint);border-radius:var(--radius);padding:12px 10px;text-align:center;}
+.sclb{font-size:9px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px;line-height:1.3;}
+.scval{font-family:'Instrument Serif',serif;font-size:1.8rem;color:var(--ink);}
+.scbar{height:3px;border-radius:2px;background:var(--faint);margin-top:6px;}
+.scfill{height:3px;border-radius:2px;}
+.fg{background:#16a34a;}.fa{background:#d97706;}.fr{background:#dc2626;}
+.raw-sec{margin-bottom:1.5rem;}
+.sec-title{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+.rc{background:var(--white);border:1px solid var(--faint);border-radius:var(--radius-lg);margin-bottom:6px;overflow:hidden;}
+.rh{display:flex;align-items:center;gap:10px;padding:11px 1rem;cursor:pointer;user-select:none;}
+.rh:hover{background:var(--faint2);}
+.rdot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.dr{background:#ff4500;}.da{background:#ff9900;}.dg{background:#4285f4;}
+.rht{font-size:13px;font-weight:500;color:var(--ink);flex:1;}
+.rhc{font-size:11px;color:var(--muted);}
+.rchev{font-size:12px;color:var(--muted);transition:transform .2s;}
+.rchev.open{transform:rotate(90deg);}
+.rbody{display:none;padding:.75rem 1rem;border-top:1px solid var(--faint);}
+.rbody.open{display:block;}
+.ri{padding:8px 10px;background:var(--faint2);border-radius:8px;margin-bottom:5px;font-size:12px;line-height:1.5;color:var(--ink);}
+.ri a{color:var(--accent);text-decoration:none;}
+.ri a:hover{text-decoration:underline;}
+.risub{font-size:10px;color:var(--muted);margin-top:2px;}
+.layers{display:flex;flex-direction:column;gap:8px;margin-bottom:1.5rem;}
+.layer{background:var(--white);border:1px solid var(--faint);border-radius:var(--radius-lg);overflow:hidden;}
+.lh{display:flex;align-items:center;gap:10px;padding:13px 1.25rem;cursor:pointer;user-select:none;}
+.lh:hover{background:var(--faint2);}
+.lnum{width:26px;height:26px;border-radius:50%;background:var(--faint2);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--muted);flex-shrink:0;}
+.lname{font-size:14px;font-weight:500;color:var(--ink);flex:1;}
+.lsrc{font-size:10px;padding:2px 8px;border-radius:20px;font-weight:500;}
+.ls-live{background:var(--green-lt);color:var(--green);}
+.ls-est{background:var(--amber-lt);color:var(--amber);}
+.lpill{font-size:12px;font-weight:600;padding:3px 11px;border-radius:20px;}
+.p-g{background:var(--green-lt);color:var(--green);}
+.p-a{background:var(--amber-lt);color:var(--amber);}
+.p-r{background:var(--red-lt);color:var(--red);}
+.lchev{font-size:12px;color:var(--muted);transition:transform .2s;}
+.lchev.open{transform:rotate(90deg);}
+.lbody{display:none;padding:1.25rem;border-top:1px solid var(--faint);}
+.lbody.open{display:block;}
+.lfind{font-size:13px;color:var(--ink2);line-height:1.75;margin-bottom:12px;}
+.kv2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.kv{padding:10px 12px;background:var(--faint2);border-radius:8px;}
+.kvk{font-size:10px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px;}
+.kvv{font-size:13px;font-weight:500;color:var(--ink);}
+.gap2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.gpos{padding:10px 12px;background:var(--green-lt);border-radius:8px;font-size:12px;color:var(--green);}
+.gneg{padding:10px 12px;background:var(--red-lt);border-radius:8px;font-size:12px;color:var(--red);}
+.gstr{display:block;font-weight:600;margin-bottom:3px;font-size:11px;text-transform:uppercase;letter-spacing:.04em;}
+.sigs{display:flex;flex-direction:column;gap:5px;margin-bottom:12px;}
+.sig{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;background:var(--faint2);border-radius:8px;font-size:12px;}
+.ssrc{font-size:10px;color:var(--muted);min-width:72px;padding-top:1px;font-weight:500;}
+.stxt{flex:1;color:var(--ink);line-height:1.5;}
+.ssent{font-size:10px;font-weight:500;padding:2px 7px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
+.ssp{background:var(--green-lt);color:var(--green);}
+.ssn{background:var(--red-lt);color:var(--red);}
+.ssu{background:var(--amber-lt);color:var(--amber);}
+.lrec{font-size:12px;padding:10px 12px;background:var(--accent-lt);color:var(--accent);border-radius:8px;font-weight:500;}
+.sublbl{font-size:11px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin:10px 0 6px;}
+.quotes{display:flex;flex-direction:column;gap:6px;margin-bottom:4px;}
+.q{font-size:12px;font-style:italic;color:var(--ink2);padding:9px 12px;background:var(--faint2);border-radius:8px;border-left:3px solid var(--faint);line-height:1.6;}
+.qsrc{font-size:10px;color:var(--muted);font-style:normal;margin-top:3px;font-weight:500;}
+.pwrow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;}
+.pw{font-size:12px;padding:3px 10px;background:var(--faint2);border:1px solid var(--faint);border-radius:20px;color:var(--ink);font-weight:500;}
+.divider{border:none;border-top:1px solid var(--faint);margin:1.75rem 0;}
+.bgrid{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-bottom:1.5rem;}
+.bc{background:var(--white);border:1px solid var(--faint);border-radius:var(--radius-lg);padding:1.25rem;}
+.bct{font-size:13px;font-weight:600;color:var(--ink);margin-bottom:10px;}
+.blist{list-style:none;padding:0;display:flex;flex-direction:column;gap:7px;}
+.blist li{font-size:13px;color:var(--ink2);line-height:1.55;padding-left:16px;position:relative;}
+.blist li::before{content:'>';position:absolute;left:0;color:var(--accent);font-weight:700;}
+.acts{display:flex;gap:8px;flex-wrap:wrap;}
+.act{flex:1;min-width:150px;padding:11px 14px;background:var(--white);border:1px solid var(--faint);border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;color:var(--ink);font-weight:500;transition:background .15s;}
+.act:hover{background:var(--faint2);}
+.act.primary{background:var(--ink);color:var(--white);border-color:transparent;}
+.act.primary:hover{background:var(--ink2);}
+.footer{text-align:center;padding:2rem 0 0;font-size:12px;color:var(--muted);}
+@media(max-width:640px){.grid2{grid-template-columns:1fr;}.sgrid{grid-template-columns:repeat(3,1fr);}.kv2,.gap2,.bgrid{grid-template-columns:1fr;}.acts{flex-direction:column;}}
 </style>
 </head>
 <body>
-
 <nav class="topbar">
-  <a class="logo" href="#">
-    <div class="logo-dot"></div>
-    ValidateIQ
-  </a>
-  <div class="topbar-right">
-    <span class="tag tag-blue">D2C Product Validation</span>
-  </div>
+  <a class="logo" href="#"><div class="logo-dot"></div>ValidateIQ</a>
+  <span class="tag">D2C Product Validation</span>
 </nav>
-
 <main class="page">
-
   <div class="hero">
     <h1>Validate your product idea<br><em>before</em> you spend a rupee.</h1>
-    <p>Live data from Reddit, Amazon and Google Shopping — synthesised by Claude into a scored validation report across 5 layers.</p>
+    <p>Live data from Reddit, Amazon and Google Shopping — analysed by Claude across 5 validation layers.</p>
   </div>
-
   <div class="form-card">
-    <div class="form-grid">
-      <div class="field form-full">
-        <label>Product idea</label>
-        <textarea id="idea" placeholder="Describe your product specifically — e.g. A high-protein meal replacement shake for busy Indian professionals. Indian flavours (mango, rose), clean ingredients, no artificial sweeteners. Subscription ₹2,500/month for 30 servings."></textarea>
-        <span class="field-note">The more specific you are, the more accurate the analysis.</span>
+    <div class="grid2">
+      <div class="field full">
+        <div class="flabel">Product idea</div>
+        <textarea id="idea" placeholder="Describe specifically — e.g. A nutrient-dense meal replacement shake for GLP-1 users and busy Indian professionals. High protein, Indian flavours (mango, rose), clean ingredients. Subscription Rs.2,500/month."></textarea>
+        <span class="fn">Be specific — the more detail, the more accurate the analysis.</span>
       </div>
       <div class="field">
-        <label>Category</label>
+        <div class="flabel">Category</div>
         <select id="cat">
-          <option>Health &amp; supplements</option>
-          <option>Meal replacement &amp; nutrition</option>
-          <option>Beauty &amp; skincare</option>
+          <option>Health and supplements</option>
+          <option>Meal replacement and nutrition</option>
+          <option>Beauty and skincare</option>
           <option>Pet products</option>
-          <option>Food &amp; beverage</option>
-          <option>Fitness &amp; wellness</option>
-          <option>Home &amp; lifestyle</option>
+          <option>Food and beverage</option>
+          <option>Fitness and wellness</option>
+          <option>Home and lifestyle</option>
         </select>
       </div>
       <div class="field">
-        <label>Target market</label>
+        <div class="flabel">Target market</div>
         <select id="mkt">
           <option>India</option>
           <option>United States</option>
           <option>United Kingdom</option>
-          <option>United States + India</option>
-          <option>Global (US, UK, India)</option>
+          <option>United States and India</option>
+          <option>Global</option>
         </select>
       </div>
       <div class="field">
-        <label>Subscription price</label>
-        <input type="text" id="price" placeholder="e.g. ₹2,500/month or $55/month" />
+        <div class="flabel">Subscription price</div>
+        <input type="text" id="price" placeholder="e.g. Rs.2,500/month or $55/month"/>
       </div>
       <div class="field">
-        <label>Known competitors <span style="font-weight:400;text-transform:none;letter-spacing:0;">(optional)</span></label>
-        <input type="text" id="comps" placeholder="e.g. OZiva, Huel, Mealshake" />
+        <div class="flabel">Known competitors <span style="font-weight:400;text-transform:none;letter-spacing:0;font-size:11px;">(optional)</span></div>
+        <input type="text" id="comps" placeholder="e.g. OZiva, Huel, Mealshake"/>
       </div>
-    </div>
-
-    <div class="api-grid">
-      <div class="api-field">
-        <div class="api-label">
-          <span>Anthropic API key</span>
-          <span class="tag tag-blue">Required</span>
-        </div>
-        <input type="password" id="claude-key" placeholder="sk-ant-..." />
-        <span class="field-note">Get yours at console.anthropic.com</span>
+      <div class="field">
+        <div class="flabel"><span>Anthropic API key</span><span class="ftag ftag-req">Required</span></div>
+        <input type="password" id="claude-key" placeholder="sk-ant-..."/>
+        <span class="fn">Get yours free at console.anthropic.com — $5 credit lasts ~1,600 runs</span>
       </div>
-      <div class="api-field">
-        <div class="api-label">
-          <span>SerpAPI key</span>
-          <span class="tag tag-green">Amazon + Google Shopping</span>
-        </div>
-        <input type="password" id="serp-key" placeholder="Free 100 searches/month at serpapi.com" />
-        <span class="field-note">Leave blank to skip live pricing data</span>
+      <div class="field">
+        <div class="flabel"><span>SerpAPI key</span><span class="ftag ftag-opt">Live Amazon + Shopping</span></div>
+        <input type="password" id="serp-key" placeholder="Free 100 searches/month at serpapi.com"/>
+        <span class="fn">Leave blank to skip live pricing — Claude will estimate instead</span>
       </div>
     </div>
   </div>
-
-  <button class="run-btn" id="run-btn" onclick="runValidation()">Run validation</button>
-
-  <div class="pipeline" id="pipeline">
-    <div class="step" id="p0"><div class="step-ic">○</div><div class="step-lb">Reddit</div></div>
-    <div class="step" id="p1"><div class="step-ic">○</div><div class="step-lb">Amazon</div></div>
-    <div class="step" id="p2"><div class="step-ic">○</div><div class="step-lb">Shopping</div></div>
-    <div class="step" id="p3"><div class="step-ic">○</div><div class="step-lb">Claude AI</div></div>
-    <div class="step" id="p4"><div class="step-ic">○</div><div class="step-lb">Scoring</div></div>
-    <div class="step" id="p5"><div class="step-ic">○</div><div class="step-lb">Report</div></div>
+  <button class="run-btn" id="run-btn" onclick="runV()">Run validation</button>
+  <div class="pipeline">
+    <div class="step" id="p0"><div class="sic">o</div><div class="slb">Reddit</div></div>
+    <div class="step" id="p1"><div class="sic">o</div><div class="slb">Amazon</div></div>
+    <div class="step" id="p2"><div class="sic">o</div><div class="slb">Shopping</div></div>
+    <div class="step" id="p3"><div class="sic">o</div><div class="slb">Claude AI</div></div>
+    <div class="step" id="p4"><div class="sic">o</div><div class="slb">Scoring</div></div>
+    <div class="step" id="p5"><div class="sic">o</div><div class="slb">Report</div></div>
   </div>
-
   <div class="logbox" id="logbox"></div>
   <div class="rpt" id="rpt"></div>
-
-  <div class="footer">
-    ValidateIQ — Built for D2C founders &amp; brand operators
-  </div>
-
+  <div class="footer">ValidateIQ — Built for D2C founders and brand operators</div>
 </main>
-
 <script>
-// ─── CONFIG ────────────────────────────────────────────────────────────────
-// Replace these with real keys if you want them pre-filled.
-// Better: leave blank and enter them in the UI each session.
-const DEFAULT_CLAUDE_KEY = '';
-const DEFAULT_SERP_KEY   = '';
+var ld={};
+var PS=['p0','p1','p2','p3','p4','p5'];
+function setS(i,skip){PS.forEach(function(id,j){var el=document.getElementById(id);el.className='step'+(j<i?' done':j===i?(skip?' skip':' active'):'');el.querySelector('.sic').textContent=j<i?'v':j===i?(skip?'!':'*'):'o';});}
+function lg(msg,t){var b=document.getElementById('logbox');b.style.display='block';var d=document.createElement('div');d.className='ll'+(t?' '+t:'');var ts=new Date().toLocaleTimeString('en-US',{hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'});d.textContent='['+ts+']  '+msg;b.appendChild(d);b.scrollTop=b.scrollHeight;}
+var wt=function(ms){return new Promise(function(r){setTimeout(r,ms);});};
+function mc(mkt){if(mkt.includes('India'))return{domain:'amazon.in',gl:'in',hl:'en',cur:'INR (Rs.)',sym:'Rs.'};if(mkt.includes('United Kingdom'))return{domain:'amazon.co.uk',gl:'gb',hl:'en',cur:'GBP',sym:'GBP '};return{domain:'amazon.com',gl:'us',hl:'en',cur:'USD',sym:'$'};}
+function kw(idea){var stop={a:1,an:1,the:1,for:1,and:1,or:1,with:1,to:1,of:1,in:1,at:1,on:1,is:1,are:1,that:1,this:1,its:1,my:1,your:1,we:1,our:1,their:1,by:1,as:1,from:1,be:1,has:1,have:1,will:1,would:1,can:1,could:1,not:1,no:1,but:1,so:1,if:1,about:1,into:1,per:1,month:1,monthly:1,subscription:1,product:1,brand:1,idea:1};return idea.toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(function(w){return w.length>2&&!stop[w];}).slice(0,5).join(' ');}
+function fc(s){return s>=70?'fg':s>=45?'fa':'fr';}
+function pc(s){return s>=70?'p-g':s>=45?'p-a':'p-r';}
 
-// ─── STATE ─────────────────────────────────────────────────────────────────
-let liveData = {};
-const PS = ['p0','p1','p2','p3','p4','p5'];
-
-// ─── UTILS ─────────────────────────────────────────────────────────────────
-function setStep(i, warn) {
-  PS.forEach((id, j) => {
-    const el = document.getElementById(id);
-    el.className = 'step' + (j < i ? ' done' : j === i ? (warn ? ' warn' : ' active') : '');
-    el.querySelector('.step-ic').textContent = j < i ? '✓' : j === i ? (warn ? '!' : '●') : '○';
-  });
+async function fetchReddit(q){
+  try{
+    var r=await fetch('/api/reddit?q='+encodeURIComponent(q));
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    var j=await r.json();
+    return j.ok?{ok:true,data:j.posts}:{ok:false,data:[],error:j.error};
+  }catch(e){return{ok:false,data:[],error:e.message};}
 }
 
-function log(msg, type) {
-  const b = document.getElementById('logbox');
-  b.style.display = 'block';
-  const d = document.createElement('div');
-  d.className = 'll' + (type ? ' ' + type : '');
-  const t = new Date().toLocaleTimeString('en-US', {hour12:false,hour:'2-digit',minute:'2-digit',second:'2-digit'});
-  d.textContent = '[' + t + ']  ' + msg;
-  b.appendChild(d);
-  b.scrollTop = b.scrollHeight;
+async function fetchAmazon(q,mktCfg,sk){
+  if(!sk)return{ok:false,data:[],error:'No SerpAPI key'};
+  try{
+    var url='/api/serp?engine=amazon&k='+encodeURIComponent(q)+'&amazon_domain='+mktCfg.domain+'&api_key='+encodeURIComponent(sk);
+    var r=await fetch(url);
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    var j=await r.json();
+    return j.ok?{ok:true,data:j.products}:{ok:false,data:[],error:j.error};
+  }catch(e){return{ok:false,data:[],error:e.message};}
 }
 
-const wait = ms => new Promise(r => setTimeout(r, ms));
-
-function marketConfig(mkt) {
-  if (mkt.includes('India'))          return { amazon_domain:'amazon.in',     gl:'in', hl:'en', currency:'INR (₹)', sym:'₹' };
-  if (mkt.includes('United Kingdom')) return { amazon_domain:'amazon.co.uk',  gl:'gb', hl:'en', currency:'GBP (£)', sym:'£' };
-  return                                     { amazon_domain:'amazon.com',    gl:'us', hl:'en', currency:'USD ($)', sym:'$' };
+async function fetchShop(q,mktCfg,sk){
+  if(!sk)return{ok:false,data:[],error:'No SerpAPI key'};
+  try{
+    var url='/api/serp?engine=google_shopping_light&q='+encodeURIComponent(q)+'&gl='+mktCfg.gl+'&hl='+mktCfg.hl+'&api_key='+encodeURIComponent(sk);
+    var r=await fetch(url);
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    var j=await r.json();
+    return j.ok?{ok:true,data:j.results}:{ok:false,data:[],error:j.error};
+  }catch(e){return{ok:false,data:[],error:e.message};}
 }
 
-function keywords(idea) {
-  const stop = new Set(['a','an','the','for','and','or','with','to','of','in','at','on','is','are','that','this','its','my','your','we','our','their','by','as','from','be','has','have','will','would','can','could','not','no','but','so','if','about','into','per','month','monthly','subscription']);
-  return idea.toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(w => w.length > 2 && !stop.has(w)).slice(0,5).join(' ');
+async function runV(){
+  var idea=document.getElementById('idea').value.trim();
+  var cat=document.getElementById('cat').value;
+  var mkt=document.getElementById('mkt').value;
+  var price=document.getElementById('price').value.trim();
+  var comps=document.getElementById('comps').value.trim();
+  var claudeKey=document.getElementById('claude-key').value.trim();
+  var sk=document.getElementById('serp-key').value.trim();
+  if(!idea){alert('Please enter a product idea.');return;}
+  if(!claudeKey){alert('Please enter your Anthropic API key.\nGet one free at console.anthropic.com');return;}
+  var btn=document.getElementById('run-btn');
+  btn.disabled=true;btn.textContent='Validating...';
+  document.getElementById('rpt').style.display='none';
+  document.getElementById('logbox').innerHTML='';
+  ld={};
+  var mktCfg=mc(mkt);
+  var q=kw(idea);
+  lg('Product: "'+idea.slice(0,65)+(idea.length>65?'...':'')+'"','info');
+  lg('Market: '+mkt+' | Currency: '+mktCfg.cur+' | Keywords: "'+q+'"','info');
+
+  setS(0);
+  lg('Fetching Reddit posts via server proxy...','info');
+  var rr=await fetchReddit(q);
+  if(rr.ok&&rr.data&&rr.data.length){ld.reddit=rr.data;lg('Reddit: '+rr.data.length+' live posts','ok');rr.data.slice(0,3).forEach(function(p){lg('  r/'+p.sub+': "'+p.title.slice(0,60)+'"');});}
+  else{ld.reddit=[];lg('Reddit: '+(rr.error||'no results')+' -- Claude will estimate','warn');setS(0,true);}
+
+  setS(1);await wt(200);
+  if(sk){
+    lg('Fetching Amazon "'+q+'" on '+mktCfg.domain+'...','info');
+    var ar=await fetchAmazon(q,mktCfg,sk);
+    if(ar.ok&&ar.data&&ar.data.length){ld.amazon=ar.data;lg('Amazon: '+ar.data.length+' products','ok');ar.data.slice(0,3).forEach(function(p){lg('  '+p.title.slice(0,50)+' - '+(p.price||'no price')+' | '+(p.rating||'?')+'* | '+(p.reviews||'?')+' reviews');});}
+    else{ld.amazon=[];lg('Amazon: '+(ar.error||'no results'),'warn');setS(1,true);}
+  }else{ld.amazon=[];lg('Amazon: no SerpAPI key -- skipping','warn');setS(1,true);}
+
+  setS(2);await wt(200);
+  if(sk){
+    lg('Fetching Google Shopping...','info');
+    var sr=await fetchShop(q,mktCfg,sk);
+    if(sr.ok&&sr.data&&sr.data.length){ld.shopping=sr.data;lg('Google Shopping: '+sr.data.length+' results','ok');}
+    else{ld.shopping=[];lg('Google Shopping: '+(sr.error||'no results'),'warn');setS(2,true);}
+  }else{ld.shopping=[];lg('Google Shopping: no SerpAPI key -- skipping','warn');setS(2,true);}
+
+  setS(3);await wt(200);
+  lg('Sending data to Claude for analysis...','info');
+
+  var hasR=ld.reddit&&ld.reddit.length>0;
+  var hasA=ld.amazon&&ld.amazon.length>0;
+  var hasS=ld.shopping&&ld.shopping.length>0;
+
+  var rt=hasR?ld.reddit.map(function(p){return'- r/'+p.sub+' ['+p.ups+' upvotes]: "'+p.title+'"'+(p.text?' | '+p.text.slice(0,160):'');}).join('\n'):'No Reddit data.';
+  var at=hasA?ld.amazon.map(function(p){return'- "'+p.title.slice(0,65)+'" | Price: '+(p.price||'N/A')+' | Rating: '+(p.rating||'N/A')+'/5 | Reviews: '+(p.reviews||'N/A')+(p.bought?' | Bought/month: '+p.bought:'');}).join('\n'):'No Amazon data.';
+  var st=hasS?ld.shopping.map(function(p){return'- "'+p.title.slice(0,65)+'" | Price: '+(p.price||'N/A')+' | '+(p.source||'N/A');}).join('\n'):'No Google Shopping data.';
+
+  var sys='You are a rigorous D2C product validation analyst. Validate this specific product using the real data provided. RULES: 1. Every finding must be about THIS product: "'+idea.slice(0,80)+'" 2. Reference actual Reddit post titles and real prices where available. 3. If a source has no data, state clearly it is estimated. 4. Use ONLY '+mktCfg.cur+' for ALL prices. 5. Be honest. Return ONLY valid JSON with no markdown:\n{"product_validated":"exact product","market_validated":"'+mkt+'","currency_used":"'+mktCfg.cur+'","overall_score":number,"verdict":"GO or ITERATE or KILL","verdict_summary":"2-3 sentences referencing actual data","data_quality":{"reddit":"'+(hasR?'live':'estimated')+'","amazon":"'+(hasA?'live':'estimated')+'","shopping":"'+(hasS?'live':'estimated')+'"},"layers":{"demand":{"score":number,"data_source":"'+(hasR?'Live Reddit':'Estimated')+'","finding":"what Reddit reveals about demand for this product","signals":[{"source":"str","text":"specific data point","sentiment":"positive or negative or neutral"}],"recommendation":"1 action"},"competitor_gap":{"score":number,"data_source":"'+(hasA?'Live Amazon':'Estimated')+'","finding":"what Amazon reveals about competition","price_range_found":"range in '+mktCfg.cur+' or Not available","avg_rating_found":"from data or Not available","signals":[{"source":"str","text":"data point","sentiment":"positive or negative or neutral"}],"top_gap":"biggest gap","top_threat":"biggest threat","recommendation":"1 action"},"willingness_to_pay":{"score":number,"data_source":"'+(hasA||hasS?'Live Amazon/Shopping':'Estimated')+'","finding":"what prices reveal about WTP in '+mktCfg.cur+'","price_ceiling":"max in '+mktCfg.cur+'","price_sweet_spot":"optimal in '+mktCfg.cur+'","signals":[{"source":"str","text":"pricing insight","sentiment":"positive or negative or neutral"}],"recommendation":"1 pricing action"},"customer_language":{"score":number,"data_source":"'+(hasR?'Live Reddit':'Estimated')+'","finding":"customer language patterns for this product","pain_quotes":[{"quote":"pain language","source":"source"},{"quote":"2nd","source":"source"},{"quote":"3rd","source":"source"}],"desire_quotes":[{"quote":"desire","source":"source"},{"quote":"2nd","source":"source"}],"power_words":["w1","w2","w3","w4","w5"],"recommendation":"1 copy direction"},"retention_signal":{"score":number,"data_source":"'+(hasA?'Live Amazon':'Estimated')+'","finding":"retention potential for this product in '+mkt+'","category_monthly_churn":"benchmark","reorder_trigger":"what drives reorder","signals":[{"source":"str","text":"insight","sentiment":"positive or negative or neutral"}],"recommendation":"1 retention action"}},"critical_risks":["r1","r2","r3"],"immediate_next_steps":["s1","s2","s3"]}';
+
+  var userMsg='Validate: '+idea+'\nCategory: '+cat+' | Market: '+mkt+' | Price: '+(price||'not set')+' | Competitors: '+(comps||'not specified')+'\n\nREDDIT ('+(hasR?ld.reddit.length+' live posts':'no data')+'):\n'+rt+'\n\nAMAZON ('+(hasA?ld.amazon.length+' products on '+mktCfg.domain:'no data')+'):\n'+at+'\n\nGOOGLE SHOPPING ('+(hasS?ld.shopping.length+' results':'no data')+'):\n'+st+'\n\nUse '+mktCfg.cur+' for all prices.';
+
+  var report;
+  try{
+    var resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':claudeKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:2000,system:sys,messages:[{role:'user',content:userMsg}]})});
+    if(!resp.ok){var ej=await resp.json().catch(function(){return{};});throw new Error((ej&&ej.error&&ej.error.message)||'HTTP '+resp.status);}
+    var js=await resp.json();
+    var raw=((js.content&&js.content[0]&&js.content[0].text)||'').trim().replace(/^```json\s*/,'').replace(/^```\s*/,'').replace(/\s*```$/,'').trim();
+    report=JSON.parse(raw);
+    lg('Claude analysis complete','ok');
+  }catch(e){lg('Claude error: '+e.message,'err');setS(3,true);btn.disabled=false;btn.textContent='Run validation';return;}
+
+  setS(4);await wt(300);
+  lg('Score: '+report.overall_score+'/100 -- Verdict: '+report.verdict,'ok');
+  setS(5);await wt(200);
+  renderR(report,idea,mkt,mktCfg);
+  btn.disabled=false;btn.textContent='Run validation';
 }
 
-function fc(s) { return s >= 70 ? 'f-g' : s >= 45 ? 'f-a' : 'f-r'; }
-function pc(s) { return s >= 70 ? 'p-g' : s >= 45 ? 'p-a' : 'p-r'; }
+function toggleRaw(id){var b=document.getElementById('rb-'+id);var c=document.getElementById('rc-'+id);b.classList.toggle('open');c.classList.toggle('open',b.classList.contains('open'));}
+function toggleLayer(id){var b=document.getElementById('lb-'+id);var c=document.getElementById('lc-'+id);b.classList.toggle('open');c.classList.toggle('open',b.classList.contains('open'));}
 
-// ─── DATA FETCHERS ──────────────────────────────────────────────────────────
-async function fetchReddit(kw) {
-  const url = 'https://www.reddit.com/search.json?q=' + encodeURIComponent(kw) + '&sort=relevance&limit=12&t=year';
-  try {
-    const r = await fetch(url, { headers: { 'User-Agent': 'ValidateIQ/1.0' } });
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const j = await r.json();
-    const posts = (j?.data?.children || []).map(p => ({
-      title:    p.data.title,
-      text:     (p.data.selftext || '').slice(0, 280),
-      sub:      p.data.subreddit,
-      ups:      p.data.ups,
-      comments: p.data.num_comments,
-      url:      'https://reddit.com' + p.data.permalink
-    }));
-    return posts.length ? { ok: true, data: posts } : { ok: false, data: [], error: 'No posts found' };
-  } catch(e) {
-    return { ok: false, data: [], error: e.message };
+function renderR(d,idea,mkt,mktCfg){
+  var vc=d.verdict==='GO'?'v-go':d.verdict==='ITERATE'?'v-iterate':'v-kill';
+  var vl=d.verdict==='GO'?'Go -- validated':d.verdict==='ITERATE'?'Iterate -- needs work':'Kill -- do not proceed';
+  var dq=d.data_quality||{};
+  var now=new Date().toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'});
+  var srcStrip=['reddit','amazon','shopping'].map(function(k){var v=dq[k]||'estimated';var cls=v==='live'?'sp-live':'sp-est';var lbl={reddit:'Reddit',amazon:'Amazon',shopping:'Google Shopping'}[k];return'<div class="sp '+cls+'"><div class="sp-dot"></div>'+lbl+': '+v+'</div>';}).join('');
+  var rawHtml='';
+  if(ld.reddit&&ld.reddit.length){var items=ld.reddit.map(function(p){return'<div class="ri"><a href="'+p.url+'" target="_blank" rel="noopener">'+p.title+'</a><div class="risub">r/'+p.sub+' - '+p.ups+' upvotes - '+p.comments+' comments</div></div>';}).join('');rawHtml+='<div class="rc"><div class="rh" onclick="toggleRaw(\'r\')"><div class="rdot dr"></div><div class="rht">Reddit posts</div><div class="rhc">'+ld.reddit.length+' live</div><div class="rchev" id="rc-r">></div></div><div class="rbody" id="rb-r">'+items+'</div></div>';}
+  if(ld.amazon&&ld.amazon.length){var items=ld.amazon.map(function(p){return'<div class="ri">'+p.title.slice(0,90)+'<div class="risub">'+(p.price||'no price')+' - '+(p.rating||'?')+'/5 stars - '+(p.reviews||'?')+' reviews'+(p.bought?' - '+p.bought:'')+' </div></div>';}).join('');rawHtml+='<div class="rc"><div class="rh" onclick="toggleRaw(\'a\')"><div class="rdot da"></div><div class="rht">Amazon products</div><div class="rhc">'+ld.amazon.length+' live</div><div class="rchev" id="rc-a">></div></div><div class="rbody" id="rb-a">'+items+'</div></div>';}
+  if(ld.shopping&&ld.shopping.length){var items=ld.shopping.map(function(p){return'<div class="ri">'+p.title.slice(0,90)+'<div class="risub">'+(p.price||'no price')+' via '+(p.source||'?')+'</div></div>';}).join('');rawHtml+='<div class="rc"><div class="rh" onclick="toggleRaw(\'s\')"><div class="rdot dg"></div><div class="rht">Google Shopping</div><div class="rhc">'+ld.shopping.length+' live</div><div class="rchev" id="rc-s">></div></div><div class="rbody" id="rb-s">'+items+'</div></div>';}
+  var layerDefs=[{key:'demand',label:'Demand signals',num:'1'},{key:'competitor_gap',label:'Competitor gaps',num:'2'},{key:'willingness_to_pay',label:'Willingness to pay',num:'3'},{key:'customer_language',label:'Customer language',num:'4'},{key:'retention_signal',label:'Retention signal',num:'5'}];
+  var scoreCards=layerDefs.map(function(def){var s=(d.layers&&d.layers[def.key]&&d.layers[def.key].score)||0;var pct=Math.min(100,Math.max(0,Math.round(s)));return'<div class="sc"><div class="sclb">'+def.label+'</div><div class="scval">'+s+'</div><div class="scbar"><div class="scfill '+fc(s)+'" style="width:'+pct+'%"></div></div></div>';}).join('');
+  function sigRows(sigs){return(sigs||[]).map(function(s){var sb=s.sentiment==='positive'?'ssp':s.sentiment==='negative'?'ssn':'ssu';return'<div class="sig"><span class="ssrc">'+s.source+'</span><span class="stxt">'+s.text+'</span><span class="ssent '+sb+'">'+s.sentiment+'</span></div>';}).join('');}
+  function layerExtra(key,lx){
+    if(key==='competitor_gap')return'<div class="gap2"><div class="gpos"><span class="gstr">Top gap</span>'+(lx.top_gap||'')+'</div><div class="gneg"><span class="gstr">Top threat</span>'+(lx.top_threat||'')+'</div></div><div class="kv2"><div class="kv"><div class="kvk">Price range (live)</div><div class="kvv">'+(lx.price_range_found||'N/A')+'</div></div><div class="kv"><div class="kvk">Avg rating (live)</div><div class="kvv">'+(lx.avg_rating_found||'N/A')+'</div></div></div>';
+    if(key==='willingness_to_pay')return'<div class="kv2"><div class="kv"><div class="kvk">Price ceiling</div><div class="kvv">'+(lx.price_ceiling||'N/A')+'</div></div><div class="kv"><div class="kvk">Sweet spot</div><div class="kvv">'+(lx.price_sweet_spot||'N/A')+'</div></div></div>';
+    if(key==='customer_language'){var pq=(lx.pain_quotes||[]).map(function(q){return'<div class="q">"'+q.quote+'"<div class="qsrc">'+q.source+'</div></div>';}).join('');var dq2=(lx.desire_quotes||[]).map(function(q){return'<div class="q">"'+q.quote+'"<div class="qsrc">'+q.source+'</div></div>';}).join('');var pw=(lx.power_words||[]).map(function(w){return'<span class="pw">'+w+'</span>';}).join('');return'<div class="sublbl">Pain language</div><div class="quotes">'+pq+'</div><div class="sublbl">Desire language</div><div class="quotes">'+dq2+'</div><div class="sublbl">Power words</div><div class="pwrow">'+pw+'</div>';}
+    if(key==='retention_signal')return'<div class="kv2"><div class="kv"><div class="kvk">Category churn</div><div class="kvv">'+(lx.category_monthly_churn||'N/A')+'</div></div><div class="kv"><div class="kvk">Reorder trigger</div><div class="kvv">'+(lx.reorder_trigger||'N/A')+'</div></div></div>';
+    return'';
   }
-}
-
-async function fetchAmazon(kw, mc, serpKey) {
-  if (!serpKey) return { ok: false, data: [], error: 'No SerpAPI key' };
-  const url = 'https://serpapi.com/search.json?engine=amazon&k=' + encodeURIComponent(kw) + '&amazon_domain=' + mc.amazon_domain + '&api_key=' + serpKey;
-  try {
-    const r = await fetch(url);
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const j = await r.json();
-    if (j.error) throw new Error(j.error);
-    const data = (j.organic_results || []).slice(0, 8).map(p => ({
-      title:   p.title || '',
-      price:   p.price || null,
-      rating:  p.rating || null,
-      reviews: p.reviews || null,
-      bought:  p.bought_last_month || null
-    })).filter(p => p.title);
-    return data.length ? { ok: true, data } : { ok: false, data: [], error: 'No results' };
-  } catch(e) {
-    return { ok: false, data: [], error: e.message };
-  }
-}
-
-async function fetchShopping(kw, mc, serpKey) {
-  if (!serpKey) return { ok: false, data: [], error: 'No SerpAPI key' };
-  const url = 'https://serpapi.com/search.json?engine=google_shopping_light&q=' + encodeURIComponent(kw) + '&gl=' + mc.gl + '&hl=' + mc.hl + '&api_key=' + serpKey;
-  try {
-    const r = await fetch(url);
-    if (!r.ok) throw new Error('HTTP ' + r.status);
-    const j = await r.json();
-    if (j.error) throw new Error(j.error);
-    const data = (j.shopping_results || []).slice(0, 8).map(p => ({
-      title:  p.title || '',
-      price:  p.price || null,
-      source: p.source || null,
-      rating: p.rating || null
-    })).filter(p => p.title);
-    return data.length ? { ok: true, data } : { ok: false, data: [], error: 'No results' };
-  } catch(e) {
-    return { ok: false, data: [], error: e.message };
-  }
-}
-
-// ─── CLAUDE ANALYSIS ────────────────────────────────────────────────────────
-async function analyseWithClaude(payload, claudeKey) {
-  const { idea, cat, mkt, price, comps, mc, hasR, hasA, hasS, redditTxt, amazonTxt, shopTxt } = payload;
-
-  const sys = `You are a rigorous D2C product validation analyst. You have real scraped data from Reddit, Amazon, and Google Shopping. Analyse this data to validate the exact product idea provided.
-
-CRITICAL RULES:
-1. Every finding must be about THIS product: "${idea}" — not a similar or generic product.
-2. Base findings on the actual data provided. Reference real post titles and real prices where available.
-3. If a data source is empty, clearly state the finding is estimated.
-4. Use ONLY ${mc.currency} for ALL prices. Never use another currency.
-5. Be honest — do not inflate positive signals.
-
-Return ONLY valid JSON with no markdown fences:
-{
-  "product_validated": "exact product description",
-  "market_validated": "${mkt}",
-  "currency_used": "${mc.currency}",
-  "overall_score": number,
-  "verdict": "GO" or "ITERATE" or "KILL",
-  "verdict_summary": "2-3 sentences referencing the actual data found",
-  "data_quality": { "reddit": "${hasR?'live':'estimated'}", "amazon": "${hasA?'live':'estimated'}", "shopping": "${hasS?'live':'estimated'}" },
-  "layers": {
-    "demand": {
-      "score": number, "data_source": "${hasR?'Live Reddit':'Estimated'}",
-      "finding": "what Reddit posts reveal about demand for this specific product",
-      "signals": [{"source":"string","text":"specific data point","sentiment":"positive|negative|neutral"}],
-      "recommendation": "1 specific action"
-    },
-    "competitor_gap": {
-      "score": number, "data_source": "${hasA?'Live Amazon':'Estimated'}",
-      "finding": "what Amazon products reveal about competition",
-      "price_range_found": "range in ${mc.currency} from Amazon data or Not available",
-      "avg_rating_found": "from Amazon data or Not available",
-      "signals": [{"source":"string","text":"data point","sentiment":"positive|negative|neutral"}],
-      "top_gap": "biggest gap this product can exploit",
-      "top_threat": "biggest competitive threat",
-      "recommendation": "1 specific action"
-    },
-    "willingness_to_pay": {
-      "score": number, "data_source": "${hasA||hasS?'Live Amazon/Shopping':'Estimated'}",
-      "finding": "what actual prices tell us about WTP vs target ${price} — use ${mc.currency}",
-      "price_ceiling": "max in ${mc.currency}",
-      "price_sweet_spot": "optimal in ${mc.currency}",
-      "signals": [{"source":"string","text":"pricing insight in ${mc.currency}","sentiment":"positive|negative|neutral"}],
-      "recommendation": "1 pricing action in ${mc.currency}"
-    },
-    "customer_language": {
-      "score": number, "data_source": "${hasR?'Live Reddit':'Estimated'}",
-      "finding": "what Reddit reveals about customer language for this product",
-      "pain_quotes": [
-        {"quote": "pain language from Reddit or estimated", "source": "${hasR?'r/subreddit':'Estimated'}"},
-        {"quote": "second pain quote", "source": "source"},
-        {"quote": "third pain quote", "source": "source"}
-      ],
-      "desire_quotes": [
-        {"quote": "desire language", "source": "source"},
-        {"quote": "second desire quote", "source": "source"}
-      ],
-      "power_words": ["word1","word2","word3","word4","word5"],
-      "recommendation": "1 copy direction sentence"
-    },
-    "retention_signal": {
-      "score": number, "data_source": "${hasA?'Live Amazon':'Estimated'}",
-      "finding": "what Amazon bought_last_month data reveals about retention potential",
-      "category_monthly_churn": "benchmark for this product type in ${mkt}",
-      "reorder_trigger": "what drives reorder for this specific product",
-      "signals": [{"source":"string","text":"retention insight","sentiment":"positive|negative|neutral"}],
-      "recommendation": "1 retention action"
-    }
-  },
-  "critical_risks": ["risk 1","risk 2","risk 3"],
-  "immediate_next_steps": ["step 1","step 2","step 3"]
-}`;
-
-  const userMsg = `Validate: ${idea}
-Category: ${cat} | Market: ${mkt} | Price: ${price||'not set'} | Competitors: ${comps||'not specified'}
-
-REDDIT DATA (${hasR?liveData.reddit.length+' live posts':'no data'}):
-${redditTxt}
-
-AMAZON DATA (${hasA?liveData.amazon.length+' live products on '+mc.amazon_domain:'no data'}):
-${amazonTxt}
-
-GOOGLE SHOPPING (${hasS?liveData.shopping.length+' live results':'no data'}):
-${shopTxt}
-
-Use ${mc.currency} for all prices. Base analysis on this specific product.`;
-
-  const r = await fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'x-api-key': claudeKey, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 2000,
-      system: sys,
-      messages: [{ role: 'user', content: userMsg }]
-    })
-  });
-
-  if (!r.ok) {
-    const err = await r.json().catch(() => ({}));
-    throw new Error(err?.error?.message || 'HTTP ' + r.status);
-  }
-  const js = await r.json();
-  const raw = (js.content?.[0]?.text || '').trim().replace(/^```json\s*/,'').replace(/^```\s*/,'').replace(/\s*```$/,'').trim();
-  return JSON.parse(raw);
-}
-
-// ─── MAIN RUN ───────────────────────────────────────────────────────────────
-async function runValidation() {
-  const idea      = document.getElementById('idea').value.trim();
-  const cat       = document.getElementById('cat').value;
-  const mkt       = document.getElementById('mkt').value;
-  const price     = document.getElementById('price').value.trim();
-  const comps     = document.getElementById('comps').value.trim();
-  const claudeKey = document.getElementById('claude-key').value.trim() || DEFAULT_CLAUDE_KEY;
-  const serpKey   = document.getElementById('serp-key').value.trim()   || DEFAULT_SERP_KEY;
-
-  if (!idea)      { alert('Please enter a product idea.'); return; }
-  if (!claudeKey) { alert('Please enter your Anthropic API key.'); return; }
-
-  const btn = document.getElementById('run-btn');
-  btn.disabled = true; btn.textContent = 'Validating...';
-  document.getElementById('rpt').style.display = 'none';
-  document.getElementById('logbox').innerHTML = '';
-  liveData = {};
-
-  const mc = marketConfig(mkt);
-  const kw = keywords(idea);
-  log('Product: "' + idea.slice(0, 70) + (idea.length > 70 ? '...' : '') + '"', 'info');
-  log('Market: ' + mkt + ' | Currency: ' + mc.currency + ' | Keywords: "' + kw + '"', 'info');
-
-  // ── STEP 0: Reddit ──
-  setStep(0);
-  log('Fetching Reddit posts...', 'info');
-  const rr = await fetchReddit(kw);
-  if (rr.ok) {
-    liveData.reddit = rr.data;
-    log('Reddit: ' + rr.data.length + ' real posts', 'ok');
-    rr.data.slice(0, 3).forEach(p => log('  r/' + p.sub + ': "' + p.title.slice(0, 65) + '"'));
-  } else {
-    liveData.reddit = [];
-    log('Reddit: ' + rr.error + ' — Claude will estimate', 'warn');
-    setStep(0, true);
-  }
-
-  // ── STEP 1: Amazon ──
-  setStep(1);
-  await wait(200);
-  log('Fetching Amazon "' + kw + '" on ' + mc.amazon_domain + '...', 'info');
-  const ar = await fetchAmazon(kw, mc, serpKey);
-  if (ar.ok) {
-    liveData.amazon = ar.data;
-    log('Amazon: ' + ar.data.length + ' real products', 'ok');
-    ar.data.slice(0, 3).forEach(p => log('  ' + p.title.slice(0, 55) + ' — ' + (p.price || 'no price') + ' | ' + (p.rating || '?') + '★ | ' + (p.reviews || '?') + ' reviews'));
-  } else {
-    liveData.amazon = [];
-    log('Amazon: ' + ar.error + ' — Claude will estimate', 'warn');
-    if (ar.error !== 'No SerpAPI key') setStep(1, true); else setStep(1);
-  }
-
-  // ── STEP 2: Google Shopping ──
-  setStep(2);
-  await wait(200);
-  log('Fetching Google Shopping...', 'info');
-  const sr = await fetchShopping(kw, mc, serpKey);
-  if (sr.ok) {
-    liveData.shopping = sr.data;
-    log('Google Shopping: ' + sr.data.length + ' results', 'ok');
-    sr.data.slice(0, 2).forEach(p => log('  ' + p.title.slice(0, 55) + ' — ' + (p.price || 'no price')));
-  } else {
-    liveData.shopping = [];
-    log('Google Shopping: ' + sr.error + ' — Claude will estimate', 'warn');
-    if (sr.error !== 'No SerpAPI key') setStep(2, true); else setStep(2);
-  }
-
-  // ── STEP 3: Claude ──
-  setStep(3);
-  await wait(200);
-  log('Sending data to Claude for analysis...', 'info');
-
-  const hasR = liveData.reddit?.length > 0;
-  const hasA = liveData.amazon?.length > 0;
-  const hasS = liveData.shopping?.length > 0;
-
-  const redditTxt = hasR
-    ? liveData.reddit.map(p => '- r/' + p.sub + ' [' + p.ups + ' upvotes]: "' + p.title + '"' + (p.text ? ' | ' + p.text.slice(0, 180) : '')).join('\n')
-    : 'No Reddit data available.';
-
-  const amazonTxt = hasA
-    ? liveData.amazon.map(p => '- "' + p.title.slice(0, 70) + '" | Price: ' + (p.price||'N/A') + ' | Rating: ' + (p.rating||'N/A') + '/5 | Reviews: ' + (p.reviews||'N/A') + (p.bought ? ' | Bought/month: ' + p.bought : '')).join('\n')
-    : 'No Amazon data available.';
-
-  const shopTxt = hasS
-    ? liveData.shopping.map(p => '- "' + p.title.slice(0,70) + '" | Price: ' + (p.price||'N/A') + ' | Source: ' + (p.source||'N/A')).join('\n')
-    : 'No Google Shopping data available.';
-
-  let report;
-  try {
-    report = await analyseWithClaude({ idea, cat, mkt, price, comps, mc, hasR, hasA, hasS, redditTxt, amazonTxt, shopTxt }, claudeKey);
-    log('Claude analysis complete', 'ok');
-  } catch(e) {
-    log('Claude error: ' + e.message, 'err');
-    setStep(3, true);
-    btn.disabled = false; btn.textContent = 'Run validation';
-    return;
-  }
-
-  // ── STEP 4: Score ──
-  setStep(4);
-  await wait(300);
-  log('Score: ' + report.overall_score + '/100 — Verdict: ' + report.verdict, 'ok');
-
-  // ── STEP 5: Render ──
-  setStep(5);
-  await wait(200);
-  renderReport(report, idea, mkt, mc);
-  btn.disabled = false; btn.textContent = 'Run validation';
-}
-
-// ─── TOGGLES ────────────────────────────────────────────────────────────────
-function toggleRaw(id) {
-  const b = document.getElementById('rb-' + id);
-  const c = document.getElementById('rc-' + id);
-  b.classList.toggle('open');
-  c.classList.toggle('open', b.classList.contains('open'));
-}
-function toggleLayer(id) {
-  const b = document.getElementById('lb-' + id);
-  const c = document.getElementById('lc-' + id);
-  b.classList.toggle('open');
-  c.classList.toggle('open', b.classList.contains('open'));
-}
-
-// ─── RENDER ──────────────────────────────────────────────────────────────────
-function renderReport(d, idea, mkt, mc) {
-  const vc = d.verdict === 'GO' ? 'v-go' : d.verdict === 'ITERATE' ? 'v-iterate' : 'v-kill';
-  const vl = d.verdict === 'GO' ? 'Go — validated' : d.verdict === 'ITERATE' ? 'Iterate — needs work' : 'Kill — do not proceed';
-  const dq = d.data_quality || {};
-  const now = new Date().toLocaleDateString('en-GB', {day:'numeric',month:'short',year:'numeric'});
-
-  // Source strip
-  const srcStrip = ['reddit','amazon','shopping'].map(k => {
-    const v = dq[k] || 'estimated';
-    const cls = v === 'live' ? 'sp-live' : 'sp-est';
-    const label = { reddit:'Reddit', amazon:'Amazon', shopping:'Google Shopping' }[k];
-    return `<div class="src-pill ${cls}"><div class="sp-dot"></div>${label}: ${v}</div>`;
-  }).join('');
-
-  // Raw data
-  let rawHtml = '';
-  if (liveData.reddit?.length) {
-    const items = liveData.reddit.map(p =>
-      `<div class="raw-item"><a href="${p.url}" target="_blank" rel="noopener">${p.title}</a><div class="raw-item-sub">r/${p.sub} · ${p.ups} upvotes · ${p.comments} comments</div></div>`
-    ).join('');
-    rawHtml += `<div class="raw-card"><div class="raw-head" onclick="toggleRaw('r')"><div class="raw-source-dot dot-reddit"></div><div class="raw-head-title">Reddit posts</div><div class="raw-head-count">${liveData.reddit.length} live</div><div class="raw-chev" id="rc-r">›</div></div><div class="raw-body" id="rb-r">${items}</div></div>`;
-  }
-  if (liveData.amazon?.length) {
-    const items = liveData.amazon.map(p =>
-      `<div class="raw-item">${p.title.slice(0,90)}<div class="raw-item-sub">${p.price||'no price'} · ${p.rating||'?'}/5 stars · ${p.reviews||'?'} reviews${p.bought?' · '+p.bought:''}</div></div>`
-    ).join('');
-    rawHtml += `<div class="raw-card"><div class="raw-head" onclick="toggleRaw('a')"><div class="raw-source-dot dot-amazon"></div><div class="raw-head-title">Amazon products</div><div class="raw-head-count">${liveData.amazon.length} live</div><div class="raw-chev" id="rc-a">›</div></div><div class="raw-body" id="rb-a">${items}</div></div>`;
-  }
-  if (liveData.shopping?.length) {
-    const items = liveData.shopping.map(p =>
-      `<div class="raw-item">${p.title.slice(0,90)}<div class="raw-item-sub">${p.price||'no price'} via ${p.source||'?'}</div></div>`
-    ).join('');
-    rawHtml += `<div class="raw-card"><div class="raw-head" onclick="toggleRaw('s')"><div class="raw-source-dot dot-google"></div><div class="raw-head-title">Google Shopping</div><div class="raw-head-count">${liveData.shopping.length} live</div><div class="raw-chev" id="rc-s">›</div></div><div class="raw-body" id="rb-s">${items}</div></div>`;
-  }
-
-  // Score cards
-  const layerDefs = [
-    {key:'demand',label:'Demand'},
-    {key:'competitor_gap',label:'Competitors'},
-    {key:'willingness_to_pay',label:'WTP'},
-    {key:'customer_language',label:'Language'},
-    {key:'retention_signal',label:'Retention'},
-  ];
-  const scoreCards = layerDefs.map(def => {
-    const s = d.layers?.[def.key]?.score || 0;
-    return `<div class="sc-card"><div class="sc-label">${def.label}</div><div class="sc-val">${s}</div><div class="sc-bar"><div class="sc-fill ${fc(s)}" style="width:${Math.min(100,s)}%"></div></div></div>`;
-  }).join('');
-
-  // Layer extras
-  function layerExtra(key, ld) {
-    if (key === 'competitor_gap') return `
-      <div class="l-extra gap2">
-        <div class="gap-pos"><span class="gap-strong">Top gap</span>${ld.top_gap||''}</div>
-        <div class="gap-neg"><span class="gap-strong">Top threat</span>${ld.top_threat||''}</div>
-      </div>
-      <div class="l-extra kv2">
-        <div class="kv"><div class="kv-k">Price range (live)</div><div class="kv-v">${ld.price_range_found||'N/A'}</div></div>
-        <div class="kv"><div class="kv-k">Avg rating (live)</div><div class="kv-v">${ld.avg_rating_found||'N/A'}</div></div>
-      </div>`;
-    if (key === 'willingness_to_pay') return `
-      <div class="l-extra kv2">
-        <div class="kv"><div class="kv-k">Price ceiling</div><div class="kv-v">${ld.price_ceiling||'N/A'}</div></div>
-        <div class="kv"><div class="kv-k">Sweet spot</div><div class="kv-v">${ld.price_sweet_spot||'N/A'}</div></div>
-      </div>`;
-    if (key === 'customer_language') {
-      const pq = (ld.pain_quotes||[]).map(q=>`<div class="q">"${q.quote}"<div class="q-src">${q.source}</div></div>`).join('');
-      const dq2 = (ld.desire_quotes||[]).map(q=>`<div class="q">"${q.quote}"<div class="q-src">${q.source}</div></div>`).join('');
-      const pw = (ld.power_words||[]).map(w=>`<span class="pw">${w}</span>`).join('');
-      return `<div class="sublabel">Pain language</div><div class="quotes">${pq}</div><div class="sublabel">Desire language</div><div class="quotes">${dq2}</div><div class="sublabel">Power words</div><div class="pw-row">${pw}</div>`;
-    }
-    if (key === 'retention_signal') return `
-      <div class="l-extra kv2">
-        <div class="kv"><div class="kv-k">Category churn</div><div class="kv-v">${ld.category_monthly_churn||'N/A'}</div></div>
-        <div class="kv"><div class="kv-k">Reorder trigger</div><div class="kv-v">${ld.reorder_trigger||'N/A'}</div></div>
-      </div>`;
-    return '';
-  }
-
-  function sigRows(sigs) {
-    return (sigs||[]).map(s => {
-      const sb = s.sentiment==='positive'?'ss-p':s.sentiment==='negative'?'ss-n':'ss-u';
-      return `<div class="sig"><span class="sig-src">${s.source}</span><span class="sig-txt">${s.text}</span><span class="sig-sent ${sb}">${s.sentiment}</span></div>`;
-    }).join('');
-  }
-
-  const layerDefs2 = [
-    {key:'demand',label:'Demand signals',num:'1'},
-    {key:'competitor_gap',label:'Competitor gaps',num:'2'},
-    {key:'willingness_to_pay',label:'Willingness to pay',num:'3'},
-    {key:'customer_language',label:'Customer language',num:'4'},
-    {key:'retention_signal',label:'Retention signal',num:'5'},
-  ];
-
-  const layersHtml = layerDefs2.map(def => {
-    const ld = d.layers?.[def.key] || {};
-    const s = ld.score || 0;
-    const live = (ld.data_source||'').toLowerCase().includes('live');
-    return `<div class="layer">
-      <div class="layer-head" onclick="toggleLayer('${def.key}')">
-        <div class="l-num">${def.num}</div>
-        <div class="l-name">${def.label}</div>
-        <span class="l-src ${live?'src-live':'src-est'}">${live?'Live':'Estimated'}</span>
-        <span class="l-pill ${pc(s)}">${s}/100</span>
-        <span class="l-chev" id="lc-${def.key}">›</span>
-      </div>
-      <div class="layer-body" id="lb-${def.key}">
-        <div class="l-finding">${ld.finding||''}</div>
-        ${layerExtra(def.key, ld)}
-        <div class="sigs">${sigRows(ld.signals)}</div>
-        <div class="l-rec">${ld.recommendation||''}</div>
-      </div>
-    </div>`;
-  }).join('');
-
-  const risks = (d.critical_risks||[]).map(r=>`<li>${r}</li>`).join('');
-  const steps = (d.immediate_next_steps||[]).map(s=>`<li>${s}</li>`).join('');
-  const ideaShort = idea.slice(0, 55);
-
-  document.getElementById('rpt').innerHTML = `
-    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:8px;">
-      <div style="font-family:'Instrument Serif',serif;font-size:1.3rem;color:var(--ink);">Validation report</div>
-      <div style="font-size:12px;color:var(--muted);">${now} · ${mkt}</div>
-    </div>
-
-    <div class="src-row"><span class="src-row-label">Data sources:</span>${srcStrip}</div>
-
-    ${rawHtml ? `<div class="raw-section"><div class="section-title">Raw data collected</div>${rawHtml}</div>` : ''}
-
-    <div class="verdict ${vc}">
-      <div class="v-eyebrow">${vl}</div>
-      <div class="v-score">${d.overall_score}<span style="font-size:1.2rem;opacity:.5;">/100</span></div>
-      <div class="v-text">${d.verdict_summary||''}</div>
-    </div>
-
-    <div class="score-grid">${scoreCards}</div>
-    <div class="layers">${layersHtml}</div>
-    <hr class="divider">
-    <div class="bottom-grid">
-      <div class="b-card">
-        <div class="b-card-title">Critical risks</div>
-        <ul class="b-list">${risks}</ul>
-      </div>
-      <div class="b-card">
-        <div class="b-card-title">Immediate next steps</div>
-        <ul class="b-list">${steps}</ul>
-      </div>
-    </div>
-    <div class="actions">
-      <button class="act" onclick="window.open('https://claude.ai','_blank')">Landing page brief ↗</button>
-      <button class="act" onclick="window.open('https://claude.ai','_blank')">Write positioning ↗</button>
-      <button class="act primary" onclick="window.open('https://claude.ai','_blank')">90-day launch plan ↗</button>
-    </div>`;
-
-  document.getElementById('rpt').style.display = 'block';
-  document.getElementById('rpt').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  var layersHtml=layerDefs.map(function(def){var lx=(d.layers&&d.layers[def.key])||{};var s=lx.score||0;var isLive=(lx.data_source||'').toLowerCase().indexOf('live')>-1;return'<div class="layer"><div class="lh" onclick="toggleLayer(\''+def.key+'\')"><div class="lnum">'+def.num+'</div><div class="lname">'+def.label+'</div><span class="lsrc '+(isLive?'ls-live':'ls-est')+'">'+(isLive?'Live':'Estimated')+'</span><span class="lpill '+pc(s)+'">'+s+'/100</span><span class="lchev" id="lc-'+def.key+'">></span></div><div class="lbody" id="lb-'+def.key+'"><div class="lfind">'+(lx.finding||'')+'</div>'+layerExtra(def.key,lx)+'<div class="sigs">'+sigRows(lx.signals)+'</div><div class="lrec">'+(lx.recommendation||'')+'</div></div></div>';}).join('');
+  var risks=(d.critical_risks||[]).map(function(r){return'<li>'+r+'</li>';}).join('');
+  var steps=(d.immediate_next_steps||[]).map(function(s){return'<li>'+s+'</li>';}).join('');
+  var is=idea.slice(0,55);
+  document.getElementById('rpt').innerHTML='<div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:8px;"><div style="font-family:Instrument Serif,serif;font-size:1.3rem;color:var(--ink);">Validation report</div><div style="font-size:12px;color:var(--muted);">'+now+' - '+mkt+'</div></div><div class="src-row"><span class="src-lbl">Data sources:</span>'+srcStrip+'</div>'+(rawHtml?'<div class="raw-sec"><div class="sec-title">Raw data collected</div>'+rawHtml+'</div>':'')+'<div class="verdict '+vc+'"><div class="vey">'+vl+'</div><div class="vscore">'+d.overall_score+'<span style="font-size:1.2rem;opacity:.5;">/100</span></div><div class="vtext">'+(d.verdict_summary||'')+'</div></div><div class="sgrid">'+scoreCards+'</div><div class="layers">'+layersHtml+'</div><hr class="divider"><div class="bgrid"><div class="bc"><div class="bct">Critical risks</div><ul class="blist">'+risks+'</ul></div><div class="bc"><div class="bct">Immediate next steps</div><ul class="blist">'+steps+'</ul></div></div>';
+  document.getElementById('rpt').style.display='block';
+  document.getElementById('rpt').scrollIntoView({behavior:'smooth',block:'start'});
 }
 </script>
 </body>
